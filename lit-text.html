@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <style type="text/css">
+      /* Slideshow styles */
+      @import url(http://fonts.googleapis.com/css?family=Droid+Serif);
+      @import url(http://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+
+      body {
+      font-family: 'Droid Serif';
+      font-size: 20px;
+      }
+      img{
+       max-width: 640px;
+       height: auto;
+      }
+      h1, h2, h3 {
+      font-family: 'Yanone Kaffeesatz';
+      font-weight: 400;
+      margin-bottom: 0;
+      }
+      h1 { font-size: 4em; }
+      h2 { font-size: 2em; }
+      h3 { font-size: 1.6em; }
+      .footnote {
+      position: absolute;
+      bottom: 3em;
+      }
+      li p { line-height: 1.25em; }
+      .red { color: #fa0000; }
+      .large { font-size: 2em; }
+      a, a > code {
+      color: rgb(249, 38, 114);
+      text-decoration: none;
+      }
+      code {
+      -moz-border-radius: 5px;
+      -web-border-radius: 5px;
+      background: #e7e8e2;
+      border-radius: 5px;
+      font-size: 16px;
+      }
+      .pull-left {
+      float: left;
+      width: 47%;
+      }
+      .pull-right {
+      float: right;
+      width: 47%;
+      }
+      .pull-right ~ p {
+      clear: both;
+      }
+      #slideshow .slide .content code {
+      font-size: 0.8em;
+      }
+      #slideshow .slide .content pre code {
+      font-size: 0.9em;
+      padding: 15px;
+      }
+      .inverse {
+      background: #272822;
+      color: #777872;
+      text-shadow: 0 0 20px #333;
+      }
+      .inverse h1, .inverse h2 {
+      color: #f3f3f3;
+      line-height: 0.8em;
+      }
+
+      /* Slide-specific styling */
+      #slide-inverse .footnote {
+      bottom: 12px;
+      left: 20px;
+      }
+      #slide-how .slides {
+      font-size: 0.9em;
+      position: absolute;
+      top:  151px;
+      right: 140px;
+      }
+      #slide-how .slides h3 {
+      margin-top: 0.2em;
+      }
+      #slide-how .slides .first, #slide-how .slides .second {
+      padding: 1px 20px;
+      height: 90px;
+      width: 120px;
+      -moz-box-shadow: 0 0 10px #777;
+      -webkit-box-shadow: 0 0 10px #777;
+      box-shadow: 0 0 10px #777;
+      }
+      #slide-how .slides .first {
+      background: #fff;
+      position: absolute;
+      top: 20%;
+      left: 20%;
+      z-index: 1;
+      }
+      #slide-how .slides .second {
+      position: relative;
+      background: #fff;
+      z-index: 0;
+      }
+
+      /* Two-column layout */
+      .left-column {
+      color: #777;
+      width: 20%;
+      height: 92%;
+      float: left;
+      }
+      .left-column h2:last-of-type, .left-column h3:last-child {
+      color: #000;
+      }
+      .right-column {
+      width: 75%;
+      float: right;
+      padding-top: 2em;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source">
+name: inverse
+layout: true
+class: center, middle, inverse
+---
+#dwango x Life is Tech
+バックエンドAPIサーバの開発ハンズオン
+---
+layout: false
+# 今日の流れ
+## 1. APIサーバーとはなにか
+## 2. サンプルアプリケーションを動かす
+## 3. mongoHQを利用したAPIサーバー
+## 4. オリジナルのAPIサーバーを書く/発表する
+---
+#今日のゴール
+## - 自作のAPIサーバをクラウド上で動かす
+## - Sinatra(Ruby) + MongoDB + Heroku
+---
+#今日やらないこと
+## - Rubyの細かい文法
+## - Gitの細かい使い方
+
+---
+#サーバー？
+## - server （給仕人）
+## - サービスを提供するモノ
+## - ビールサーバー / ウォーターサーバー
+## - 「Webサービスを提供するソフトウェア」
+
+---
+## Webサーバー / APIサーバー?
+### Webサーバー
+#### - ブラウザからの要求（リクエスト）に対してHTMLを返す（レスポンス）
+#### - ブラウザはWebページを表示して、その結果を人間が見る
+
+### APIサーバー
+#### - クライアント（スマホとかPCとか）からの要求に対してJSON/XML等を返す
+#### - レスポンスは機械（クライアント）が利用する
+
+
+## 今日はAPIサーバーを作ります
+---
+.left-column[
+###APIサーバーを作る
+
+- 何が出来る？
+]
+.right-column[
+## APIサーバーがあると、作れるクライアントアプリケーションの幅が広がる
+### - ゲームのスコア集計/ランキング
+### - グループウェア
+### - メッセンジャー
+]
+---
+.left-column[
+###APIサーバーを作る
+
+- 何が出来る？
+- そもそもAPIサーバーとは？
+]
+.right-column[
+### - HTTPを利用してデータ提供をする
+### - クライアント（PC/スマホ etc...）は欲しいデータをサーバにリクエストし、そのレスポンスを処理してユーザーに提供する
+### - クライアントが持っていないデータを提供することが出来る
+]
+
+---
+
+class: left, middle, inverse
+#早速APIサーバーを作って動かしてみよう
+
+---
+
+class: left, middle, inverse
+##その前にHeroku Toolbeltはインストールできてますか？
+
+---
+
+class: left, middle, inverse
+#APIサーバをつくる
+
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+]
+.right-column[
+## サンプルアプリケーションを動かしてみよう
+```shell
+$ gem install bundle 
+$ git clone git@github.com:lit-dwango/sample-hello.git
+$ cd sample-hello
+$ bundle install --path=vendor
+$ bundle exec rackup config.ru -p 4567
+```
+1.bundleをインストール
+
+2.gitレポジトリからサンプルアプリケーションをclone
+
+3.cloneしたディレクトリに移動
+
+4.サンプルアプリケーションを使う準備
+
+5.サンプルアプリケーションを起動
+
+6.ブラウザで http://localhost:4567 にアクセス
+]
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+]
+.right-column[
+## サンプルにアクセスしてみる
+### GETメソッド
+> http://localhost:4567/hello?name=yourName
+
+>> hello! yourName (GET /hello)
+
+> http://localhost:4567/hello/yourName
+
+>> hello! yourName (GET /hello/:name)
+
+### POSTメソッド
+- パラメータとして 'name=yourName' を指定する
+> http://localhost:4567/hello
+
+>> hello! yourName (POST /hello)
+]
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+
+- コード解説
+]
+.right-column[
+## sinatra hello world!
+#### GETメソッド
+```ruby
+ get '/hello' do
+       name = params[:name]
+       "hello! #{name} (GET /hello)"
+ end
+```
+- http://localhost:4567/hello?name=yourName にGETメソッドでアクセスした場合に呼び出される
+```ruby
+ get '/hello/:name' do
+       name = params[:name]
+       "hello! #{name} (GET /hello/:name)"
+ end
+```
+- http://localhost:4567/hello/yourName にGETメソッドでアクセスした場合に呼び出される
+- クエリパラメータはparamsの中に入っている
+]
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+
+- コード解説
+]
+.right-column[
+## sinatra hello world!
+#### POSTメソッド
+```ruby
+ post '/hello' do
+       name = params[:name]
+       "hello! #{name} (POST /hello)"
+ end
+```
+- http://localhost:4567/hello にPOSTメソッドでアクセスした場合に呼び出される
+- GETの場合同様にパラメータも取得できる
+]
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+
+- コード解説
+
+- HTTPメソッドとは
+]
+.right-column[
+.center[![HTTP Response](image/response.png)]
+]
+
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+
+- コード解説
+
+- HTTPメソッドとは
+]
+.right-column[
+## HTTPメソッドとは？
+
+
+- クライアントがサーバーに対して行いたい処理をサーバー伝える方法
+- 特に GET/POST/PUT/DELETE の4つのメソッドだけでCRUDという性質を満たす
+ - Create/Read/Update/Deleteのデータ操作の基本となる4つの処理
+- 同じURLに対して別のメソッドを使うことで、サーバー側で全く別の処理が行われる
+]
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+
+- コード解説
+
+- HTTPメソッドとは
+
+- herokuにデプロイ
+]
+.right-column[
+## herokuにデプロイしよう
+
+```shell
+$ heroku login # ユーザー名とパスワードを聞かれるので入力
+$ heroku create 
+$ git push heroku master
+$ heroku open
+```
+]
+---
+.left-column[
+###APIサーバーをつくる
+
+- サンプルを動かす
+
+- アクセスしてみる
+
+- コード解説
+
+- HTTPメソッドとは
+
+- サンプルを弄る
+]
+.right-column[
+## サンプルを色々弄ってみよう
+
+- Hello以外を表示
+
+- num1 + num2 の結果を返す
+
+- 現在時刻を返す
+
+コードを変更した後は以下のようにデプロイ
+```shell
+$ git add .
+$ git commit # -> コミットログを記入する
+$ git push heroku master
+$ heroku open
+```
+- コミットログ: 変更内容についてのログ
+]
+
+---
+
+class: left, middle, inverse
+#データを永続化してみよう
+
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+]
+.right-column[
+## データの永続化とは？
+- サービスを提供するために必要なデータを保存しておくこと
+
+ - アカウント情報 / コメント情報 / 購入情報 etc...
+
+- 保存先はファイル/データベース/その他
+
+## 今日はMongoDBを使います
+
+- データベース
+
+- データをJSONライクな形式で表現される「ドキュメント」として扱う
+
+]
+
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- mongoHQ上にDBを作る
+]
+.right-column[
+## mongoHQ上にDBを作ろう
+1.FreeプランのDBを作る
+
+2.DBができたら'Admin' -> 'Users'タブをクリック
+
+3.user/passwordを追加
+
+4.環境変数を追加
+```shell
+# Mac/Linux
+export MONGODB_URI=mongodb://username:password@host:port/dbname
+# windows
+set MONGODB_URI=mongodb://username:password@host:port/dbname
+```
+]
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+]
+.right-column[
+## メモ帳アプリケーションを動かしてみよう
+```shell
+$ cd ..
+$ git clone git@github.com:lit-dwango/sample-memo.git
+$ cd sample-memo
+$ bundle install --path=vendor
+$ bundle exec rackup config.ru -p 4567
+```
+]
+
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+]
+.right-column[
+## メモを追加してみよう
+
+1.'POST'を選び、URI入力欄に 'http://localhost:4567/memos' を入力
+
+2.'Parameters'の'Add Parameters'をクリック
+
+3.'name'に'title'を、'value'に適当なタイトルを入力
+
+4.'name'に'description'を、'value'に適当なメモを入力
+
+5.'GET' を選び 'http://localhost:4567/memos' にアクセスするとメモの一覧が取れる
+]
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+]
+.right-column[
+## mongodbへの接続
+
+```ruby
+def mongo
+   return @mongo if @mongo
+   # 省略
+   client = Mongo::MongoClient.new
+   @mongo = client.db
+end
+
+```
+- 環境変数[MONGODB_URI]にmongoHQで取得したURLを設定する
+- アプリケーションの実行時にmongoHQに接続する
+]
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+]
+.right-column[
+## mongoHQのデータを参照
+
+```ruby
+def memos
+   # 'memos'というコレクションにつなぐ
+   mongo.collection("memos")
+end
+
+get '/memos' do
+   # コレクション内のドキュメントを取り出す
+   memos.find.to_a.to_json
+end
+```
+
+```json
+[
+    {
+        "_id": {
+            "$oid": "5304e60cb05b44c3fc000001"
+        },
+        "title": "タイトルテスト",
+        "description": "メモメモ"
+    }
+]
+```
+]
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+
+]
+.right-column[
+## メモを追加する（POSTする）
+
+```ruby
+post '/memos' do
+   # 省略
+   # memos.insert でコレクションにデータを追加
+   inserted_id = memos.insert({
+     "title" => params[:title],
+     "description" => params[:description]
+   })
+end
+```
+
+- 追加されたドキュメント
+```bson
+{
+  _id: ObjectId("5304e60cb05b44c3fc000001"),
+  title: "タイトルテスト",
+  description: "メモメモ"
+}
+```
+]
+---
+.left-column[
+
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+
+]
+.right-column[
+## メモを編集する（PUT）
+
+```ruby
+put '/memos/:id' do
+   # 省略
+   object_id = BSON::ObjectId(params[:id])
+
+   # 更新対象の確認
+   docs = coll.find("_id" => object_id).to_a
+   # 更新対象がない場合は'404 Not Found'
+   if docs.size < 1
+     halt 404, { "message" => "not found" }.to_json
+   end
+
+   # 実際にデータを更新する
+   filter = ["title", "description"]
+   update_params = params.select { |key,_| filter.include? key }
+   coll.update({ "_id" => object_id }, docs[0].merge(update_params))
+
+   updated_docs = coll.find({ "_id" => object_id }).to_a
+
+   # 省略
+end
+
+```
+
+]
+---
+.left-column[
+
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+
+]
+.right-column[
+## メモを削除する（DELETE）
+
+```ruby
+delete '/memos/:id' do
+   db = get_connection
+   coll = db.collection("memos")
+
+   # 指定されたidのドキュメントを削除する
+   object_id = BSON::ObjectId(params[:id])
+   coll.remove({ "_id" => object_id })
+
+   # 指定されたidのドキュメントを検索して1個以上見つかる場合は
+   # ドキュメントの削除に失敗しているので
+   # '500 InternalServerError'を返す
+   if coll.find({ "_id" => object_id }).to_a.size > 0
+     halt 500, { "message" => "failed to remove memo" }.to_json
+   end
+
+   { "message" => "succeeded to remove memo" }.to_json
+end
+```
+]
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+
+- herokuにデプロイする
+]
+.right-column[
+## herokuにデプロイしよう
+
+```shell
+$ heroku create 
+$ heroku config:set MONGODB_URI={mongodbのURI}
+$ git push heroku master
+$ heroku open
+```
+]
+
+---
+.left-column[
+## データ永続化
+
+- 永続化とは？
+
+- サンプルを動かす
+
+- herokuにデプロイする
+
+- サンプルを弄る
+]
+.right-column[
+## サンプルを色々弄ってみよう
+
+### - メモを書いた人の名前も保存する
+
+### - メモの追加時刻/更新時刻も保存する        
+
+### - メモを検索する
+]
+---
+class: left, middle, inverse
+# オリジナルAPIサーバーをつくろう
+---
+class: left 
+## どんなサービス？
+
+### - 画像アップローダ
+
+### - ゲームランキングサーバー
+
+### - メッセンジャーサーバー        
+---
+class: left
+# 画像アップローダ
+## - 画像をアップロードできる
+
+## - 画像リンクを含む画像の情報を提供する
+
+## - 画像IDを指定して画像の情報を取得できる
+---
+.left-column[
+### アップローダーをつくる
+        
+#### - サンプルのclone        
+]        
+.right-column[
+### 画像アップローダのサンプルを見てみよう
+
+```shell
+$ cd ..
+$ git clone git@github.com:lit-dwango/sample-uploder.git
+$ cd sample-uploder
+$ bundle install --path=vendor
+$ bundle exec rackup config.ru -p 4567
+```
+]
+---
+.left-column[
+
+### アップローダーをつくる
+
+#### - サンプルのclone        
+
+#### - 画像の保存
+]        
+.right-column[
+### 画像をアップロード出来るようにする
+
+```ruby
+post '/pics' do
+  # 省略
+  # ファイルのmimetypeを確認する
+  file_ext_match = params[:file][:type].match(/^image\/(.+)/)
+  if file_ext_match.nil? or file_ext_match.size < 1
+    halt 400, { message: "invalid file type" }.to_json
+  end
+
+  # 画像ファイルを保存する
+  # 保存先は'public/raw/pics 以下                                           
+  filename = "#{Time.now.to_i}.#{file_ext_match[1]}"
+  File.open("./public/raw/pics/#{filename}", "wb") do |f|
+   f.write params[:file][:tempfile].read
+  end
+
+  # 画像に関する情報をmongodbに保存                                          
+  id = pics.insert({ filename: filename, content_type: params[:file][:type], posted_at: Time.now.to_i })
+
+end
+```
+]
+
+---
+class: left, middle
+# アイデアを形にしてみよう                                                  
+---
+class: left
+## 今日のはまだまだほんの一例
+
+### - 認証
+
+### - クライアントの入力値の検証
+
+### - クライアントとの連携                                              
+
+### - 当然パフォーマンス
+---
+class: left, middle, inverse
+# Enjoy!
+    </textarea>
+    <script src="http://gnab.github.io/remark/downloads/remark-0.6.0.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create();
+    </script>
+  </body>
+</html>
